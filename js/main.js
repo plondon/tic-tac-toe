@@ -76,7 +76,20 @@ var Game = function() {
 				   this.computer == $(f).last().text()) {
 				this.populate($(e).index(), this.computer);
 				return true;
-			} else if (e.length == 1 &&
+			} 
+		}
+		for ( var i = 0; i < 8; i++ ) {
+			var x = [];
+			for ( var j = 0; j < 3; j++ ) {
+				x.push(this.$cells[this.w[i][j]]);
+			}
+			var e = x.filter(function(cell) {
+				return $(cell).is(':empty');
+			});
+			var f = x.filter(function(cell) {
+				return !$(cell).is(':empty');
+			});
+			if (e.length == 1 &&
 					 this.player == $(f).first().text() &&
 				   this.player == $(f).last().text()) {
 				this.populate($(e).index(), this.computer);
@@ -143,13 +156,14 @@ var Game = function() {
 					 $(f[1]).text() === this.computer &&
 					 $(f[2]).text() === this.computer) {
 				alert('Computer Wins');
+				this.winner = true;
 				this.playAgain();
 			}
 		}
 		var draw = this.$cells.filter(function() {
 			return !$(this).is(':empty');
 		});
-		if (draw.length == 9) {
+		if (draw.length == 9 && !this.winner) {
 			alert('It\'s a Draw');
 			this.playAgain();
 		}
