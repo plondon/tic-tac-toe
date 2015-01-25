@@ -6,7 +6,7 @@ $(document).ready(function() {
 	});
 
 	$('.board li').on('click', function(e) {
-		game.populate(e);
+		game.humanMove(e);
 	});
 });
 
@@ -15,227 +15,149 @@ var Game = function() {
 	this.$modal = $('.modal');
 	this.$board = $('.board');
 	this.$cells = $('.board li');
+	this.winner = undefined;
 	this.$modal.show();
+	this.first = true;
+	this.w = [
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8],
+		[0, 3, 6],
+		[1, 4, 7],
+		[2, 5, 8],
+		[0, 4, 8],
+		[6, 4, 2]
+	];
 
 	this.init = function(e) {
 		var $this = $(e.currentTarget);
 		this.$body.removeClass('overlay');
 		this.$modal.hide();
 
-		this.rows = [this.$cells.slice(0,3),
-								 this.$cells.slice(3,6),
-								 this.$cells.slice(6,9)];
-
-		this.cols = [$('.board li:nth-child(3n+1)'),
-								 $('.board li:nth-child(3n+2)'),
-								 $('.board li:nth-child(3n+3)')];
-
-		this.diags = [$('.board li:nth-child(4n + 1)'),
-									$([this.$cells[2], this.$cells[4], this.$cells[6]])];
-
 		if ( $this.index() === 0 ) {
 			this.computer = 'x';
 			this.player = 'o';
-			this.move();
+			this.compMove();
 		} else {
 			this.player = 'x';
 			this.computer = 'o';
 		}
-
-		this.first = true;
 	};
 
-	this.analyzeBoard = function() {
-		var self = this;
-
-		this.rows.forEach(function(row) {
-			var string = self.formString(row);
-			self.checkWinner(string);
-		});
-		this.cols.forEach(function(col) {
-			var string = self.formString(col);
-			self.checkWinner(string);
-		});
-		this.diags.forEach(function(diag) {
-			var string = self.formString(diag);
-			self.checkWinner(string);
-		});
-	};
-
-	this.formString = function(dir) {
-		var string = dir.map(function(){ 
-			return $(this).text();
-		}).get().join();
-
-		return string;
-	};
-
-	this.checkWinner = function(string) {
-		if ( (string === 'x,x,x' && this.computer == 'x' ) ||
-			(string === 'o,o,o' && this.computer == 'o' )) {
-			setTimeout(function() {
-				alert('Computer Wins');
-				var w = window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-			}, 500);
-		}
-	};
-
-	// almost exactly the same as defense
-	this.canWin = function() {
-		for ( var i = 0; i < 3; i++ ) {
-			if (this.rowState[i].length < 3 &&
-					this.rowState[i].length >= 2 &&
-					this.rowState[i][0] == this.computer &&
-					this.rowState[i][0] == this.rowState[i][1]) {
-				this.hitCell(this.rows, i);
-				return true;
-			} else if (this.colState[i].length < 3 &&
-					this.colState[i].length >= 2 && 
-				  this.colState[i][0] == this.computer &&
-				  this.colState[i][0] == this.colState[i][1]) {
-				this.hitCell(this.cols, i);
-				return true;
-			} else if (this.diagState[i] && 
-					this.diagState[i].length < 3 &&
-					this.diagState[i].length >= 2 && 
-				  this.diagState[i][0] == this.computer &&
-				  this.diagState[i][0] == this.diagState[i][1]) {
-				this.hitCell(this.diags, i);
-				return true;
-			}
-		}
-	};
-
-	this.defense = function() {
-		for ( var i = 0; i < 3; i++ ) {
-			if (this.rowState[i].length < 3 &&
-					this.rowState[i].length >= 2 &&
-					this.rowState[i][0] == this.player &&
-					this.rowState[i][0] == this.rowState[i][1]) {
-					this.hitCell(this.rows, i);
-				return true;
-			} else if (this.colState[i].length < 3 &&
-					this.colState[i].length >= 2 && 
-				  this.colState[i][0] == this.player &&
-				  this.colState[i][0] == this.colState[i][1]) {
-					this.hitCell(this.cols, i);
-				return true;
-			} else if (this.diagState[i] && 
-					this.diagState[i].length < 3 &&
-					this.diagState[i].length >= 2 && 
-				  this.diagState[i][0] == this.player &&
-				  this.diagState[i][0] == this.diagState[i][1]) {
-					this.hitCell(this.diags, i);
-				return true;
-			} else if (this.diagState[i] && 
-				  this.diagState[i].length == 3 &&
-				  this.rowState[i + 2] &&
-				  this.rowState[i + 2].length < 2) {
-					if ( $(this.$cells[1]).is(':empty') ) {
-						$(this.$cells[1]).text(this.computer);
-					}
-				return true;
-			}
-		}
-	};
-
-	// clean up offense function
-	this.offense = function() {
-		var self = this;
-		if ( this.first && this.computer === 'o' ) {
-			var target = this.$cells.filter(function() {
-				return $(this).data('score') >= 20 && $(this).is(':empty');
-			});
-			if (!target.length) {
-				this.$cells.each(function() {
-					if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
-						$(this).text(self.computer);
-						return false;
-					}
-				});	
-			} else {
-				target.text(self.computer);
-			}
-		} else {
-			this.$cells.each(function() {
-				if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
-					$(this).text(self.computer);
-					return false;
-				}
-			});
-		}
-
-		this.first = false;
-	};
-
-	this.hitCell = function(dir, i) {
-		$(dir[i]).filter(function() {
-			return $(this).is(':empty');
-		}).text(this.computer);
-	};
-
-	this.move = function() {
-		this.busy = true;
-
-		this.getStates();
-
-		// what is this can you clean it up?
-		if (this.canWin() ) {
-			this.analyzeBoard();
-			return false;
-		} else if (this.defense()) {
-		} else {
-			this.offense();
-		}
-
-		this.analyzeBoard();
-
-		this.busy = false;
-	};
-
-	this.getStates = function() {
-		this.rowState = [];
-		this.colState = [];
-		this.diagState = [];
-		var self = this;
-
-		this.rows.forEach(function(row) {
-			var state = row.map(function() {
-				if ( $(this).text().length ) {
-					return $(this).text();
-				}
-			});
-			self.rowState.push(state);
-		});
-
-		this.cols.forEach(function(col) {
-			var state = col.map(function() {
-				if ( $(this).text().length ) {
-					return $(this).text();
-				}
-			});
-			self.colState.push(state);
-		});
-
-		this.diags.forEach(function(diag) {
-			var state = diag.map(function() {
-				if ( $(this).text().length ) {
-					return $(this).text();
-				}
-			});
-			self.diagState.push(state);
-		});
-	};
-
-	this.populate = function(e) {
+	this.humanMove = function(e) {
 		if ( this.busy ) { return; }
 		var $this = $(e.currentTarget);
 
-		if ( !$this.is(':empty') ) {
-			return false;
-		} else {
+		if ( $this.is(':empty') ) {
 			$this.text(this.player);
-			this.move();
+			this.first = false;
+			this.compMove();
+		} else {
+			return false;
+		}
+	};
+
+	this.compMove = function() {
+		var idx;
+		var self = this;
+		this.busy = true;
+		if (this.first) {
+			idx = [0, 2, 6, 8][Math.floor(Math.random()*4)];
+		} else if (this.fatal()) {
+			idx = this.fatal(this.computer);
+		} else {
+			idx = this.bestMove(this.$cells);
+		}
+
+		this.populate(idx, this.computer);
+		setTimeout(function() { self.gameOver(); }, 1000);
+		this.busy = false;
+	};
+	this.fatal = function() {
+		for ( var i = 0; i < 8; i++ ) {
+			var x = [];
+			for ( var j = 0; j < 3; j++ ) {
+				x.push(this.$cells[this.w[i][j]]);
+			}
+			var e = x.filter(function(cell) {
+				return $(cell).is(':empty');
+			});
+			var f = x.filter(function(cell) {
+				return !$(cell).is(':empty');
+			});
+			if ( e.length == 1 &&
+					 this.computer == $(f).first().text() &&
+				   this.computer == $(f).last().text()) {
+				this.populate($(e).index(), this.computer);
+				return true;
+			} else if (e.length == 1 &&
+					 this.player == $(f).first().text() &&
+				   this.player == $(f).last().text()) {
+				this.populate($(e).index(), this.computer);
+				return true;
+			}
+		}
+	};
+
+	this.bestMove = function($cells) {
+		var self = this;
+		var bestMove;
+
+		$cells = $cells.filter(function() {
+			return $(this).is(':empty');
+		});
+
+		if (this.fork()) {
+			$(this.$cells[1]).data('score', 40);
+		}
+
+		$cells.sort(function(a,b) {
+			return ($(a).data('score')) < ($(b).data('score')) ? 1 : -1;    
+		});
+
+		return $cells.first().index();
+	};
+
+	this.fork = function() {
+		for ( var i = 0; i < 8; i++ ) {
+			var x = [];
+			for ( var j = 0; j < 3; j++ ) {
+				x.push(this.$cells[this.w[i][j]]);
+			}
+			var f = x.filter(function(cell) {
+				return !$(cell).is(':empty');
+			}).map(function(cl) {
+				return $(cl).text();
+			});
+
+			if (f.toString() == ["x", "o", "x"].toString()) {
+				return true;
+			}
+		}
+	};
+
+	this.populate = function(idx, player) {
+		var self = this;
+		setTimeout(function() {
+			$(self.$cells[idx]).text(player);
+		}, 500);
+	};
+
+	this.gameOver = function() {
+		for ( var i = 0; i < 8; i++ ) {
+			var x = [];
+			for ( var j = 0; j < 3; j++ ) {
+				x.push(this.$cells[this.w[i][j]]);
+			}
+			var f = x.filter(function(cell) {
+				return !$(cell).is(':empty');
+			});
+			if ( f.length == 3 &&
+					 $(f[0]).text() === this.computer &&
+					 $(f[1]).text() === this.computer &&
+					 $(f[2]).text() === this.computer) {
+				alert('computer wins');
+			}
 		}
 	};
 };
