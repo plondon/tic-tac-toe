@@ -59,7 +59,7 @@ var Game = function() {
 		setTimeout(function() { self.gameOver(); }, 1000);
 		this.busy = false;
 	};
-	this.fatal = function() {
+	this.fatal = function(player) {
 		for ( var i = 0; i < 8; i++ ) {
 			var x = [];
 			for ( var j = 0; j < 3; j++ ) {
@@ -76,7 +76,7 @@ var Game = function() {
 				   this.computer == $(f).last().text()) {
 				this.populate($(e).index(), this.computer);
 				return true;
-			} 
+			}
 		}
 		for ( var i = 0; i < 8; i++ ) {
 			var x = [];
@@ -143,6 +143,7 @@ var Game = function() {
 	};
 
 	this.gameOver = function() {
+		var self = this;
 		for ( var i = 0; i < 8; i++ ) {
 			var x = [];
 			for ( var j = 0; j < 3; j++ ) {
@@ -155,9 +156,12 @@ var Game = function() {
 					 $(f[0]).text() === this.computer &&
 					 $(f[1]).text() === this.computer &&
 					 $(f[2]).text() === this.computer) {
-				alert('Computer Wins');
-				this.winner = true;
-				this.playAgain();
+				$(f).addClass('winner');
+				setTimeout(function() {
+					alert('Computer Wins');
+					self.winner = true;
+					self.playAgain();
+				}, 1000);
 			}
 		}
 		var draw = this.$cells.filter(function() {

@@ -72,6 +72,11 @@ button {
 	text-align: center;
 	font-size: 52px;
 	cursor: pointer;
+	color: black;
+	opacity: .6;
+	-webkit-transition: color 0.3s, opacity 0.3s;
+	-moz-transition: color 0.3s, opacity 0.3s;
+	transition: color 0.3s, opacity 0.3s;
 }
 
 .board li:nth-child(3n) {
@@ -80,6 +85,11 @@ button {
 
 .board li:nth-child(n+7) {
 	border-bottom: 0px;
+}
+
+.board li.winner {
+	color: #58AC5C;
+	opacity: 1;
 }
 
 /*modal*/
