@@ -150,7 +150,7 @@ var Game = function() {
 			return !$(this).is(':empty');
 		});
 		if (draw.length == 9) {
-			alert('Draw');
+			alert('It\'s a Draw');
 			this.playAgain();
 		}
 	};
