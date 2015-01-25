@@ -80,37 +80,30 @@ var Game = function() {
 		}
 	};
 
+	// almost exactly the same as defense
 	this.canWin = function() {
 		for ( var i = 0; i < 3; i++ ) {
 			if (this.rowState[i].length < 3 &&
 					this.rowState[i].length >= 2 &&
 					this.rowState[i][0] == this.computer &&
 					this.rowState[i][0] == this.rowState[i][1]) {
-				this.win(this.rows, i);
+				this.hitCell(this.rows, i);
 				return true;
 			} else if (this.colState[i].length < 3 &&
 					this.colState[i].length >= 2 && 
 				  this.colState[i][0] == this.computer &&
 				  this.colState[i][0] == this.colState[i][1]) {
-				this.win(this.cols, i);
+				this.hitCell(this.cols, i);
 				return true;
 			} else if (this.diagState[i] && 
 					this.diagState[i].length < 3 &&
 					this.diagState[i].length >= 2 && 
 				  this.diagState[i][0] == this.computer &&
 				  this.diagState[i][0] == this.diagState[i][1]) {
-				this.win(this.diags, i);
+				this.hitCell(this.diags, i);
 				return true;
-			} else {
-				return false;
 			}
 		}
-	};
-
-	this.win = function(dir, i) {
-		$(dir[i]).filter(function() {
-			return $(this).is(':empty');
-		}).text(this.computer);
 	};
 
 	this.defense = function() {
@@ -119,32 +112,34 @@ var Game = function() {
 					this.rowState[i].length >= 2 &&
 					this.rowState[i][0] == this.player &&
 					this.rowState[i][0] == this.rowState[i][1]) {
-				this.defend(this.rows, i);
+					this.hitCell(this.rows, i);
 				return true;
 			} else if (this.colState[i].length < 3 &&
 					this.colState[i].length >= 2 && 
 				  this.colState[i][0] == this.player &&
 				  this.colState[i][0] == this.colState[i][1]) {
-				this.defend(this.cols, i);
+					this.hitCell(this.cols, i);
 				return true;
 			} else if (this.diagState[i] && 
 					this.diagState[i].length < 3 &&
 					this.diagState[i].length >= 2 && 
 				  this.diagState[i][0] == this.player &&
 				  this.diagState[i][0] == this.diagState[i][1]) {
-				this.defend(this.diags, i);
+					this.hitCell(this.diags, i);
+				return true;
+			} else if (this.diagState[i] && 
+				  this.diagState[i].length == 3) {
+					if ( $(this.$cells[1]).is(':empty') ) {
+						$(this.$cells[1]).text(this.computer);
+					} else {
+						this.offense();
+					}
 				return true;
 			}
 		}
 	};
 
-	// same function as win (should change)
-	this.defend = function(dir, i) {
-		$(dir[i]).filter(function() {
-			return $(this).is(':empty');
-		}).text(this.computer);
-	};
-
+	// clean up offense function
 	this.offense = function() {
 		var self = this;
 		if ( this.first && this.computer === 'o' ) {
@@ -173,15 +168,22 @@ var Game = function() {
 		this.first = false;
 	};
 
+	this.hitCell = function(dir, i) {
+		$(dir[i]).filter(function() {
+			return $(this).is(':empty');
+		}).text(this.computer);
+	};
+
 	this.move = function() {
 		this.busy = true;
 
 		this.getStates();
 
+		// what is this can you clean it up?
 		if (this.canWin() ) {
 			this.analyzeBoard();
 			return false;
-		} else if (this.defense()) { 
+		} else if (this.defense()) {
 		} else {
 			this.offense();
 		}
