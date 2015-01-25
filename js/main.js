@@ -128,11 +128,11 @@ var Game = function() {
 					this.hitCell(this.diags, i);
 				return true;
 			} else if (this.diagState[i] && 
-				  this.diagState[i].length == 3) {
+				  this.diagState[i].length == 3 &&
+				  this.rowState[i + 2] &&
+				  this.rowState[i + 2].length < 2) {
 					if ( $(this.$cells[1]).is(':empty') ) {
 						$(this.$cells[1]).text(this.computer);
-					} else {
-						this.offense();
 					}
 				return true;
 			}
