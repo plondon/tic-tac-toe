@@ -158,6 +158,8 @@ var Game = function() {
 						return false;
 					}
 				});	
+			} else {
+				target.text(self.computer);
 			}
 		} else {
 			this.$cells.each(function() {
