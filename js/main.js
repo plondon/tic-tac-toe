@@ -76,7 +76,7 @@ var Game = function() {
 			setTimeout(function() {
 				alert('Computer Wins');
 				var w = window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-			}, 1000);
+			}, 500);
 		}
 	};
 
@@ -145,22 +145,29 @@ var Game = function() {
 		}).text(this.computer);
 	};
 
-
 	this.offense = function() {
 		var self = this;
-		this.$cells.each(function() {
-			if ( self.first && self.computer === 'o' ) {
+		if ( self.first && self.computer === 'o' ) {
+			this.$cells.each(function() {
 				if ( $(this).data('score') >= 20 && $(this).is(':empty')  ) {
 					$(this).text(self.computer);
 					return false;
 				}
-			} else {
-				if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
+				else {
+					if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
 						$(this).text(self.computer);
 						return false;
 					}
 				}
-		});
+			});
+		} else {
+			this.$cells.each(function() {
+				if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
+					$(this).text(self.computer);
+					return false;
+				}
+			});
+		}
 
 		this.first = false;
 	};
