@@ -60,6 +60,7 @@ var Game = function() {
 		this.busy = false;
 	};
 	this.fatal = function(player) {
+		// win
 		for ( var i = 0; i < 8; i++ ) {
 			var x = [];
 			for ( var j = 0; j < 3; j++ ) {
@@ -78,6 +79,7 @@ var Game = function() {
 				return true;
 			}
 		}
+		// defend
 		for ( var i = 0; i < 8; i++ ) {
 			var x = [];
 			for ( var j = 0; j < 3; j++ ) {
@@ -161,7 +163,7 @@ var Game = function() {
 					alert('Computer Wins');
 					self.winner = true;
 					self.playAgain();
-				}, 1100);
+				}, 1050);
 			}
 		}
 		var draw = this.$cells.filter(function() {
@@ -172,7 +174,7 @@ var Game = function() {
 			setTimeout(function() {
 				alert('It\'s a Draw');
 				self.playAgain();
-			}, 1100);
+			}, 1050);
 		}
 	};
 
