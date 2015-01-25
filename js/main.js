@@ -161,15 +161,18 @@ var Game = function() {
 					alert('Computer Wins');
 					self.winner = true;
 					self.playAgain();
-				}, 1000);
+				}, 1100);
 			}
 		}
 		var draw = this.$cells.filter(function() {
 			return !$(this).is(':empty');
 		});
 		if (draw.length == 9 && !this.winner) {
-			alert('It\'s a Draw');
-			this.playAgain();
+			this.$cells.addClass('draw');
+			setTimeout(function() {
+				alert('It\'s a Draw');
+				self.playAgain();
+			}, 1100);
 		}
 	};
 

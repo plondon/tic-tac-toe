@@ -92,6 +92,11 @@ button {
 	opacity: 1;
 }
 
+.board li.draw {
+	color: #ED4337;
+	opacity: 1;
+}
+
 /*modal*/
 
 #comp:after, #user:after {
