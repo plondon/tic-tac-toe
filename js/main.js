@@ -73,8 +73,10 @@ var Game = function() {
 	this.checkWinner = function(string) {
 		if ( (string === 'x,x,x' && this.computer == 'x' ) ||
 			(string === 'o,o,o' && this.computer == 'o' )) {
-			alert('Computer Wins');
-			var w = window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+			setTimeout(function() {
+				alert('Computer Wins');
+				var w = window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+			}, 1000);
 		}
 	};
 
@@ -159,6 +161,8 @@ var Game = function() {
 					}
 				}
 		});
+
+		this.first = false;
 	};
 
 	this.move = function() {
