@@ -147,19 +147,18 @@ var Game = function() {
 
 	this.offense = function() {
 		var self = this;
-		if ( self.first && self.computer === 'o' ) {
-			this.$cells.each(function() {
-				if ( $(this).data('score') >= 20 && $(this).is(':empty')  ) {
-					$(this).text(self.computer);
-					return false;
-				}
-				else {
+		if ( this.first && this.computer === 'o' ) {
+			var target = this.$cells.filter(function() {
+				return $(this).data('score') >= 20 && $(this).is(':empty');
+			});
+			if (!target.length) {
+				this.$cells.each(function() {
 					if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
 						$(this).text(self.computer);
 						return false;
 					}
-				}
-			});
+				});	
+			}
 		} else {
 			this.$cells.each(function() {
 				if ( $(this).data('score') >= 10 && $(this).is(':empty') ) {
