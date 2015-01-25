@@ -1,22 +1,9 @@
-$(document).ready(function() {
-	var game = new Game();
-
-	$('.modal button').on('click', function(e) {
-		game.init(e);
-	});
-
-	$('.board li').on('click', function(e) {
-		game.humanMove(e);
-	});
-});
-
 var Game = function() {
 	this.$body = $('body');
 	this.$modal = $('.modal');
 	this.$board = $('.board');
 	this.$cells = $('.board li');
-	this.winner = undefined;
-	this.$modal.show();
+	this.$clonedCells = this.$cells.clone();
 	this.first = true;
 	this.w = [
 		[0, 1, 2],
@@ -32,7 +19,6 @@ var Game = function() {
 	this.init = function(e) {
 		var $this = $(e.currentTarget);
 		this.$body.removeClass('overlay');
-		this.$modal.hide();
 
 		if ( $this.index() === 0 ) {
 			this.computer = 'x';
@@ -156,9 +142,22 @@ var Game = function() {
 					 $(f[0]).text() === this.computer &&
 					 $(f[1]).text() === this.computer &&
 					 $(f[2]).text() === this.computer) {
-				alert('computer wins');
+				alert('Computer Wins');
+				this.playAgain();
 			}
 		}
+		var draw = this.$cells.filter(function() {
+			return !$(this).is(':empty');
+		});
+		if (draw.length == 9) {
+			alert('Draw');
+			this.playAgain();
+		}
+	};
+
+	this.playAgain = function() {
+		this.$body.addClass('overlay');
+		window.location.reload();
 	};
 };
 
