@@ -108,8 +108,10 @@ var Game = function() {
 			return $(this).is(':empty');
 		});
 
-		if (this.fork()) {
+		if (this.fork() || !$(this.$cells[7]).is(':empty')) {
 			$(this.$cells[1]).data('score', 40);
+			$(this.$cells[6]).data('score', 30);
+			$(this.$cells[8]).data('score', 30);
 		}
 
 		$cells.sort(function(a,b) {
@@ -130,7 +132,7 @@ var Game = function() {
 			}).map(function(cl) {
 				return $(cl).text();
 			});
-
+			console.log(f.toString());
 			if (f.toString() == ["x", "o", "x"].toString()) {
 				return true;
 			}
