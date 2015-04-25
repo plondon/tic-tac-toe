@@ -22,31 +22,66 @@
     		</div>
 				
         <ul class="board clear">
-        	<li data-score="10"></li>
-        	<li data-score="5"></li>
-        	<li data-score="10"></li>
-        	<li data-score="5"></li>
-        	<li data-score="20"></li>
-        	<li data-score="5"></li>
-        	<li data-score="10"></li>
-        	<li data-score="5"></li>
-        	<li data-score="10"></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
+        	<li></li>
         </ul>
 
     	</div>
-    		<script>
-	    		$(document).ready(function() {
-	    			var game = new Game();
+            <script src="js/boards.js"></script>
+            <script src="js/main.js"></script>
+            <script>
+                window.switch = function() {
+                    window.reset();
+                    if ( window.activePlayer === 'x' ) {
+                        window.activePlayer = 'o';
+                        window.inactivePlayer = 'x';
+                        window.turn = 'o';
+                    } else {
+                        window.activePlayer = 'x';
+                        window.inactivePlayer = 'o';
+                        window.turn = 'x';
+                    }
+                }
 
-	    			$('.modal button').on('click', function(e) {
-	    				game.init(e);
-	    			});
+                $(document).ready(function() {
+                    $('.modal button').on('click', function(e) {
+                        $('body').removeClass('overlay');
+                        var $this = $(e.currentTarget);
 
-	    			$('.board li').on('click', function(e) {
-	    				game.humanMove(e);
-	    			});
-	    		});
-    		</script>
-        <script src="js/main.js"></script>
+                        if ( $this.index() === 0 ) {
+                            window.first = true;
+                            window.activePlayer = 'x';
+                            window.inactivePlayer = 'o';
+                            window.turn = 'x';
+
+                            minimax(getBoard($('.board')));
+                        }
+                    });
+
+                    $('.board li').on('click', function(e) {
+                        window.switch();
+                        var $this = $(e.currentTarget);
+                        var idx = $this.index();
+
+                        $($('.board').find('li')[idx]).text(window.activePlayer);
+
+                        window.switch();
+                        minimax(getBoard($('.board')));
+                        
+                        setTimeout(function() {
+                            $($('.board li')[choice]).text(window.activePlayer);
+                        },0);
+                    });
+
+
+                });
+            </script>
     </body>
 </html>

@@ -1,188 +1,125 @@
-var Game = function() {
-	this.$body = $('body');
-	this.$modal = $('.modal');
-	this.$board = $('.board');
-	this.$cells = $('.board li');
-	this.$clonedCells = this.$cells.clone();
-	this.first = true;
-	this.w = [
-		[0, 1, 2],
-		[3, 4, 5],
-		[6, 7, 8],
-		[0, 3, 6],
-		[1, 4, 7],
-		[2, 5, 8],
-		[0, 4, 8],
-		[6, 4, 2]
-	];
+var winningCombos = [
+ 										 //horizontal
+                     [0,1,2], 
+                     [3,4,5],
+                     [6,7,8],
+                     // vertical
+                     [0,3,6],
+                     [1,4,7],
+                     [2,5,8],
+                     // diagonal
+                     [0,4,8],
+                     [2,4,6]];
 
-	this.init = function(e) {
-		var $this = $(e.currentTarget);
-		this.$body.removeClass('overlay');
 
-		if ( $this.index() === 0 ) {
-			this.computer = 'x';
-			this.player = 'o';
-			this.compMove();
-		} else {
-			this.player = 'x';
-			this.computer = 'o';
+
+var gameOver = function (board) {
+	results = [];
+	winningCombos.forEach(function (combo) {
+		var result = '';
+		for (var i = 0; i < 3; i++) {
+			result += board[combo[i]];
 		}
-	};
+		results.push(result);
+	});
 
-	this.humanMove = function(e) {
-		if ( this.busy ) { return; }
-		var $this = $(e.currentTarget);
-
-		if ( $this.is(':empty') ) {
-			$this.text(this.player);
-			this.first = false;
-			this.compMove();
-		} else {
-			return false;
-		}
-	};
-
-	this.compMove = function() {
-		var idx;
-		var self = this;
-		this.busy = true;
-		if (this.first) {
-			idx = [0, 2, 6, 8][Math.floor(Math.random()*4)];
-		} else if (this.fatal()) {
-			idx = this.fatal(this.computer);
-		} else {
-			idx = this.bestMove(this.$cells);
-		}
-
-		this.populate(idx, this.computer);
-		setTimeout(function() { self.gameOver(); }, 1000);
-		this.busy = false;
-	};
-	this.fatal = function(player) {
-		// win
-		for ( var i = 0; i < 8; i++ ) {
-			var x = [];
-			for ( var j = 0; j < 3; j++ ) {
-				x.push(this.$cells[this.w[i][j]]);
-			}
-			var e = x.filter(function(cell) {
-				return $(cell).is(':empty');
-			});
-			var f = x.filter(function(cell) {
-				return !$(cell).is(':empty');
-			});
-			if ( e.length == 1 &&
-					 this.computer == $(f).first().text() &&
-				   this.computer == $(f).last().text()) {
-				this.populate($(e).index(), this.computer);
-				return true;
-			}
-		}
-		// defend
-		for ( var i = 0; i < 8; i++ ) {
-			var x = [];
-			for ( var j = 0; j < 3; j++ ) {
-				x.push(this.$cells[this.w[i][j]]);
-			}
-			var e = x.filter(function(cell) {
-				return $(cell).is(':empty');
-			});
-			var f = x.filter(function(cell) {
-				return !$(cell).is(':empty');
-			});
-			if (e.length == 1 &&
-					 this.player == $(f).first().text() &&
-				   this.player == $(f).last().text()) {
-				this.populate($(e).index(), this.computer);
-				return true;
-			}
-		}
-	};
-
-	this.bestMove = function($cells) {
-		var self = this;
-		var bestMove;
-
-		$cells = $cells.filter(function() {
-			return $(this).is(':empty');
-		});
-
-		if (this.fork() || !$(this.$cells[7]).is(':empty')) {
-			$(this.$cells[1]).data('score', 40);
-			$(this.$cells[6]).data('score', 30);
-			$(this.$cells[8]).data('score', 30);
-		}
-
-		$cells.sort(function(a,b) {
-			return ($(a).data('score')) < ($(b).data('score')) ? 1 : -1;    
-		});
-
-		return $cells.first().index();
-	};
-
-	this.fork = function() {
-		for ( var i = 0; i < 8; i++ ) {
-			var x = [];
-			for ( var j = 0; j < 3; j++ ) {
-				x.push(this.$cells[this.w[i][j]]);
-			}
-			var f = x.filter(function(cell) {
-				return !$(cell).is(':empty');
-			}).map(function(cl) {
-				return $(cl).text();
-			});
-			console.log(f.toString());
-			if (f.toString() == ["x", "o", "x"].toString()) {
-				return true;
-			}
-		}
-	};
-
-	this.populate = function(idx, player) {
-		var self = this;
-		setTimeout(function() {
-			$(self.$cells[idx]).text(player);
-		}, 500);
-	};
-
-	this.gameOver = function() {
-		var self = this;
-		for ( var i = 0; i < 8; i++ ) {
-			var x = [];
-			for ( var j = 0; j < 3; j++ ) {
-				x.push(this.$cells[this.w[i][j]]);
-			}
-			var f = x.filter(function(cell) {
-				return !$(cell).is(':empty');
-			});
-			if ( f.length == 3 &&
-					 $(f[0]).text() === this.computer &&
-					 $(f[1]).text() === this.computer &&
-					 $(f[2]).text() === this.computer) {
-				$(f).addClass('winner');
-				setTimeout(function() {
-					alert('Computer Wins');
-					self.winner = true;
-					self.playAgain();
-				}, 1050);
-			}
-		}
-		var draw = this.$cells.filter(function() {
-			return !$(this).is(':empty');
-		});
-		if (draw.length == 9 && !this.winner) {
-			this.$cells.addClass('draw');
-			setTimeout(function() {
-				alert('It\'s a Draw');
-				self.playAgain();
-			}, 1050);
-		}
-	};
-
-	this.playAgain = function() {
-		this.$body.addClass('overlay');
-		window.location.reload();
-	};
+	if ( results.indexOf('xxx') != -1 ) {
+		this.winner = 'x';
+		return 10;
+	} else if ( results.indexOf('ooo') != -1 ) {
+		this.winner = 'o';
+		return 10;
+	} else if (board.join("").length === 9) {
+		return 0;
+	} else {
+		return false;
+	}
 };
 
+
+var reset = function() {
+	this.choices = [];
+	arr = [];
+};
+
+var minimax = function(board) {
+	if ( window.first ) { powerMove(); return; }
+	if ( gameOver(board) || gameOver(board) === 0 ) {
+		var score = this.winner === window.activePlayer ? gameOver(board) : -gameOver(board);
+		return score;
+	}
+
+	getPossibleMoves(board).forEach(function(move) {
+		var game = getGameState(board, move);
+		var result = minimax(game);
+
+		if ( result ) {
+			this.choices.push([result, move, window.turn]);
+		}
+	});
+
+	if ( window.turn === window.activePlayer ) {
+		freq = {};
+		this.choices.forEach(function(choice) {
+			freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+		});
+
+		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
+
+		max = Math.max.apply(null, arr);
+
+		for (var i in freq) {
+			if ( freq[i] === max) {
+				choice = parseInt(i);
+			}
+		}
+	} else {
+		freq = {};
+		this.choices.forEach(function(choice) {
+			freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+		});
+
+		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
+
+		min = Math.max.apply(null, arr);
+
+		for (var i in freq) {
+			if ( freq[i] === min) {
+				choice = parseInt(i);
+			}
+		}
+
+	}
+
+};
+
+var getPossibleMoves = function(board) {
+	for (var a=[],i=board.length;i--;) if (board[i]==="") a.push(i);
+	return a.reverse();  
+};
+
+var getGameState = function(board, idx) {
+	var clone = board.slice(0);
+
+	if ( window.turn === window.activePlayer ) {
+		window.turn = window.inactivePlayer;
+	} else {
+		window.turn = window.activePlayer;
+	}
+
+	clone[idx] = window.turn;
+	return clone;
+};
+
+var getBoard = function($board) {
+	return $board.find('li').map(function() { return $(this).text(); }).get();
+};
+
+var powerMove = function() {
+	var powerMoves = [0,2];
+
+	var random = powerMoves[Math.floor(Math.random()*powerMoves.length)];
+	$($('.board').find('li')[random]).text(window.activePlayer);
+
+	window.first = false;
+};
