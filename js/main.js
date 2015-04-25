@@ -61,7 +61,9 @@ var minimax = function(board) {
 	if ( window.turn === window.activePlayer ) {
 		freq = {};
 		this.choices.forEach(function(choice) {
-			freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+			if ( choice[2] === window.activePlayer ) {
+				freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+			}
 		});
 
 		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
@@ -76,7 +78,9 @@ var minimax = function(board) {
 	} else {
 		freq = {};
 		this.choices.forEach(function(choice) {
-			freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+			if ( choice[2] !== window.activePlayer ) {
+				freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+			}
 		});
 
 		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
