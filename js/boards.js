@@ -16,5 +16,5 @@ var oneMoreToWin = ["o","x","o",
                     "x","o",""];
 
 var twoMoreToWin = ["x","","",
-                    "","","",
-                    "","o","x"];
+                    "","o","",
+                    "x","o","x"];

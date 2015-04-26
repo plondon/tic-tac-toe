@@ -36,9 +36,13 @@ var gameOver = function (board) {
 	}
 };
 
+window.choices = [];
+window.moves = [];
+arr = [];
 
 var reset = function() {
-	this.choices = [];
+	window.choices = [];
+	window.moves = [];
 	arr = [];
 };
 
@@ -53,45 +57,45 @@ var minimax = function(board) {
 		var game = getGameState(board, move);
 		var result = minimax(game);
 
+		console.log(result);
 		if ( result ) {
-			this.choices.push([result, move, window.turn]);
+			window.moves.push(move);
+			window.choices.push([result, move, window.turn]);
 		}
 	});
 
 	if ( window.turn === window.activePlayer ) {
-		freq = {};
-		this.choices.forEach(function(choice) {
-			if ( choice[2] === window.activePlayer ) {
-				freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
-			}
-		});
+		// this.choices.forEach(function(choice) {
+		// 	if ( choice[2] === window.activePlayer ) {
+		// 		freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+		// 	}
+		// });
 
-		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
+		// arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
 
-		max = Math.max.apply(null, arr);
+		// max = Math.max.apply(null, arr);
 
-		for (var i in freq) {
-			if ( freq[i] === max) {
-				choice = parseInt(i);
-			}
-		}
+		// for (var i in freq) {
+		// 	if ( freq[i] === max) {
+		// 		choice = parseInt(i);
+		// 	}
+		// }
 	} else {
-		freq = {};
-		this.choices.forEach(function(choice) {
-			if ( choice[2] !== window.activePlayer ) {
-				freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
-			}
-		});
+		// this.choices.forEach(function(choice) {
+		// 	if ( choice[2] !== window.activePlayer ) {
+		// 		freq[choice[1]] = freq[choice[1]] === undefined ? 1 :  freq[choice[1]]+=1;
+		// 	}
+		// });
 
-		arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
+		// arr = Object.keys( freq ).map(function ( key ) { return freq[key]; });
 
-		min = Math.max.apply(null, arr);
+		// min = Math.max.apply(null, arr);
 
-		for (var i in freq) {
-			if ( freq[i] === min) {
-				choice = parseInt(i);
-			}
-		}
+		// for (var i in freq) {
+		// 	if ( freq[i] === min) {
+		// 		choice = parseInt(i);
+		// 	}
+		// }
 
 	}
 
@@ -105,13 +109,13 @@ var getPossibleMoves = function(board) {
 var getGameState = function(board, idx) {
 	var clone = board.slice(0);
 
+	clone[idx] = window.turn;
+
 	if ( window.turn === window.activePlayer ) {
 		window.turn = window.inactivePlayer;
 	} else {
 		window.turn = window.activePlayer;
 	}
-
-	clone[idx] = window.turn;
 	return clone;
 };
 

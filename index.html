@@ -38,7 +38,6 @@
             <script src="js/main.js"></script>
             <script>
                 window.switch = function() {
-                    window.reset();
                     if ( window.activePlayer === 'x' ) {
                         window.activePlayer = 'o';
                         window.inactivePlayer = 'x';
@@ -72,7 +71,6 @@
 
                         $($('.board').find('li')[idx]).text(window.activePlayer);
 
-                        window.switch();
                         minimax(getBoard($('.board')));
                         
                         setTimeout(function() {
